@@ -231,25 +231,21 @@ public class EnunciateJaxrsContext extends EnunciateModuleContext {
    * @param rootResource The root resource to add to the model.
    */
   public void add(RootResource rootResource) {
-    if (rootResource.isInterface()) {
-      //if the root resource is an interface, don't add it if its implementation has already been added (avoid duplication).
-      for (RootResource resource : this.rootResources) {
-        if (((DecoratedTypeMirror)(resource.asType())).isInstanceOf(rootResource)) {
-          debug("%s was identified as a JAX-RS root resource, but will be ignored because root resource %s implements it.", rootResource.getQualifiedName(), resource.getQualifiedName());
-          return;
-        }
+    //don't add the root resource if its implementation has already been added (avoid duplication).
+    for (RootResource resource : this.rootResources) {
+      if (((DecoratedTypeMirror)(resource.asType())).isInstanceOf(rootResource)) {
+        debug("%s was identified as a JAX-RS root resource, but will be ignored because root resource %s implements it.", rootResource.getQualifiedName(), resource.getQualifiedName());
+        return;
       }
     }
-    else {
-      //remove any interfaces of this root resource that have been identified as root resources (avoid duplication)
-      DecoratedTypeMirror rootResourceType = (DecoratedTypeMirror) rootResource.asType();
-      Iterator<RootResource> it = this.rootResources.iterator();
-      while (it.hasNext()) {
-        RootResource resource = it.next();
-        if (rootResourceType.isInstanceOf(resource)) {
-          debug("%s was identified as a JAX-RS root resource, but will be ignored because root resource %s implements it.", resource.getQualifiedName(), rootResource.getQualifiedName());
-          it.remove();
-        }
+    //remove any interfaces of this root resource that have been identified as root resources (avoid duplication)
+    DecoratedTypeMirror rootResourceType = (DecoratedTypeMirror) rootResource.asType();
+    Iterator<RootResource> it = this.rootResources.iterator();
+    while (it.hasNext()) {
+      RootResource resource = it.next();
+      if (rootResourceType.isInstanceOf(resource)) {
+        debug("%s was identified as a JAX-RS root resource, but will be ignored because root resource %s implements it.", resource.getQualifiedName(), rootResource.getQualifiedName());
+        it.remove();
       }
     }
 
